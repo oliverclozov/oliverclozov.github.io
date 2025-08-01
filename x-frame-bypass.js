@@ -22,7 +22,7 @@ customElements.define('x-frame-bypass', class extends HTMLIFrameElement {
 			throw new Error(`X-Frame-Bypass src ${url} does not start with http(s)://`)
 		}
 
-		console.log('X-Frame-Bypass loading URL:', url)
+		console.log('[x-frame-bypass] Loading URL:', url)
 		this.srcdoc = `<!DOCTYPE html>
 <html>
 <head>
