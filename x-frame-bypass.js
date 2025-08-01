@@ -12,6 +12,7 @@ customElements.define('x-frame-bypass', class extends HTMLIFrameElement {
             return;
         }
         else{
+            console.log('[x-frame-bypass] src attribute change in attributeChangedCallback:', url);
             this.load(this.src);
         }
     }
