@@ -1,9 +1,9 @@
 customElements.define('x-frame-bypass', class extends HTMLIFrameElement {
 	static get observedAttributes() {
-		return ['src']
+		return ['src'];
 	}
 	constructor () {
-		super()
+		super();
 	}
     attributeChangedCallback(name, oldValue, newValue) {
         if (name !== 'src') return;
@@ -18,7 +18,8 @@ customElements.define('x-frame-bypass', class extends HTMLIFrameElement {
 		this.load(newValue);
     }
 	connectedCallback () {
-		this.sandbox = '' + this.sandbox || 'allow-forms allow-modals allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-top-navigation-by-user-activation' // all except allow-top-navigation
+		this.sandbox = this.getAttribute('sandbox') || 'allow-forms allow-modals allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts';
+
 	}
 	load (url, options) {
 		if (!url){
@@ -27,10 +28,10 @@ customElements.define('x-frame-bypass', class extends HTMLIFrameElement {
 		}
 		if (!url.startsWith('http')){
 			console.error('[x-frame-bypass] Invalid URL:', url);
-			throw new Error(`[x-frame-bypass] src ${url} does not start with http(s)://`)
+			throw new Error(`[x-frame-bypass] src ${url} does not start with http(s)://`);
 		}
 
-		console.log('[x-frame-bypass] Loading URL:', url)
+		console.log('[x-frame-bypass] Loading URL:', url);
 		this.srcdoc = `<!DOCTYPE html>
 <html>
 <head>
@@ -46,54 +47,64 @@ customElements.define('x-frame-bypass', class extends HTMLIFrameElement {
 		animation: loader 1s infinite ease-in-out;
 	}
 	@keyframes loader {
-		0% {
-		transform: scale(0);
-		}
-		100% {
-		transform: scale(1);
-		opacity: 0;
-		}
+        0% { transform: scale(0); }
+        100% { transform: scale(1); opacity: 0; }
 	}
 	</style>
 </head>
 <body>
 	<div class="loader"></div>
 </body>
-</html>`
+</html>`;
 		this.fetchProxy(url, options, 0).then(res => res.text()).then(data => {
-			if (data) this.srcdoc = data.replace(/<head([^>]*)>/i, `<head$1>
+            if (data) {
+                data = data
+                    .replace(/<head([^>]*)>/i, `<head$1>
 	<base href="${url}">
 	<script>
+	// Override frame-busting
+    Object.defineProperty(window, 'top', { get: () => window });
+    Object.defineProperty(window, 'parent', { get: () => window });
+
 	// X-Frame-Bypass navigation event handlers
 	document.addEventListener('click', e => {
 		if (frameElement && document.activeElement && document.activeElement.href) {
-			e.preventDefault()
-			frameElement.load(document.activeElement.href)
+			e.preventDefault();
+			frameElement.load(document.activeElement.href);
 		}
-	})
+	});
 	document.addEventListener('submit', e => {
 		if (frameElement && document.activeElement && document.activeElement.form && document.activeElement.form.action) {
-			e.preventDefault()
-			if (document.activeElement.form.method === 'post') frameElement.load(document.activeElement.form.action, {method: 'post', body: new FormData(document.activeElement.form)})
-			else frameElement.load(document.activeElement.form.action + '?' + new URLSearchParams(new FormData(document.activeElement.form)))
+			e.preventDefault();
+			if (document.activeElement.form.method === 'post'){
+				 frameElement.load(document.activeElement.form.action, {method: 'post', body: new FormData(document.activeElement.form)});
+			}
+			else{
+				frameElement.load(document.activeElement.form.action + '?' + new URLSearchParams(new FormData(document.activeElement.form)));
+			}
 		}
-	})
-	</script>`).replace(/ crossorigin=['"][^'"]*['"]/gi, '')
-		}).catch(e => console.error('Cannot load X-Frame-Bypass:', e))
+	});
+    </script>`)
+                    .replace(/top\.location\s*=\s*self\.location/g, 'console.log("Blocked frame busting")')
+                    .replace(/<script[^>]*>.*?top\.location\s*=.*?<\/script>/gis, '<!-- blocked frame busting script -->')
+                    .replace(/ crossorigin=['"][^'"]*['"]/gi, '');
+                this.srcdoc = data;
+            }
+        }).catch(e => console.error('Cannot load X-Frame-Bypass:', e));
 	}
 	fetchProxy (url, options, i) {
 		const proxies = (options || {}).proxies || [
 			'https://api.allorigins.win/raw?url=',
 			'https://api.codetabs.com/v1/proxy/?quest=',
 			'https://cors-anywhere.herokuapp.com/'
-		]
+        ];
 		return fetch(proxies[i] + encodeURIComponent(url), options).then(res => {
 			if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-			return res
+            return res;
 		}).catch(error => {
 			console.warn(`[x-frame-bypass] Proxy #${i} failed.`, error);
-			if (i === proxies.length - 1) throw error
-			return this.fetchProxy(url, options, i + 1)
-		})
+            if (i === proxies.length - 1) throw error;
+            return this.fetchProxy(url, options, i + 1);
+        });
 	}
-}, {extends: 'iframe'})
+}, {extends: 'iframe'});

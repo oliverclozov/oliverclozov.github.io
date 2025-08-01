@@ -16,7 +16,7 @@
   <h1>If Website Below Loads, site is Vulnerable to Clickjacking</h1>
   <input type="text" id="urlInput" placeholder="Enter URL here" style="width: 100%; padding: 8px;" />
   <button id="loadFrameCJ">Load iframe</button>
-  <iframe id="myFrameCJ" sandbox="allow-scripts allow-forms" src=""></iframe>
+  <iframe id="myFrameCJ" src=""></iframe>
   
   <script>
     const iframeCJ = document.getElementById('myFrameCJ');
@@ -25,14 +25,14 @@
     document.getElementById('loadFrameCJ').addEventListener('click', () => {
         const url = urlInputCJ.value;
         console.log('[HTML] Clickjacking iframe src set to:', url);
-        iframeCJ.setAttribute('src', url);
-        //iframeCJ.src = url;
+        iframeCJ.src = url;
     });
   </script>
 
   <h1>If Website Below Loads, site is Vulnerable to X-Frame Bypass</h1>
   <button id="loadFrame">Load iframe</button>
   <iframe is="x-frame-bypass" id="myFrame" src=""></iframe>
+  
   <button id="fetchHeaders">Fetch Headers</button>
   <pre id="headers">Click "Fetch Headers" to view response headers.</pre>
 
