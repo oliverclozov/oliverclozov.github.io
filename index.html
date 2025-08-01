@@ -16,7 +16,7 @@
   <h1>If Website Below Loads, site is Vulnerable to Clickjacking</h1>
   <input type="text" id="urlInput" placeholder="Enter URL here" style="width: 100%; padding: 8px;" />
   <button id="loadFrameCJ">Load iframe</button>
-  <iframe id="myFrameCJ" src=""></iframe>
+  <iframe id="myFrameCJ" sandbox="allow-scripts allow-forms" src=""></iframe>
   
   <script>
     const iframeCJ = document.getElementById('myFrameCJ');
