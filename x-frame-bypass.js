@@ -25,7 +25,7 @@ customElements.define('x-frame-bypass', class extends HTMLIFrameElement {
 		}
 		if (!url.startsWith('http')){
 			console.error('[x-frame-bypass] Invalid URL:', url);
-			throw new Error(`X-Frame-Bypass src ${url} does not start with http(s)://`)
+			throw new Error(`[x-frame-bypass] src ${url} does not start with http(s)://`)
 		}
 
 		console.log('[x-frame-bypass] Loading URL:', url)
