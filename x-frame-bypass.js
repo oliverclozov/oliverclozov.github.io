@@ -5,10 +5,16 @@ customElements.define('x-frame-bypass', class extends HTMLIFrameElement {
 	constructor () {
 		super()
 	}
-	attributeChangedCallback () {
-		console.log('[x-frame-bypass] src attribute changed to:', this.src);
-		this.load(this.src)
-	}
+    attributeChangedCallback(url) {
+        // Prevent auto-loading if src is empty or unchanged
+        if (!url){
+            console.log('[x-frame-bypass] Ignoring src change: empty or unchanged.');
+            return;
+        }
+        else{
+            this.load(this.src);
+        }
+    }
 	connectedCallback () {
 		this.sandbox = '' + this.sandbox || 'allow-forms allow-modals allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-top-navigation-by-user-activation' // all except allow-top-navigation
 	}
