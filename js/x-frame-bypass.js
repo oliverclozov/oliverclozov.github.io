@@ -8,7 +8,7 @@ customElements.define('x-frame-bypass', class extends HTMLIFrameElement {
     attributeChangedCallback(url) {
         // Prevent auto-loading if src is empty or unchanged
         if (!url){
-            console.warn('[x-frame-bypass] Ignoring src change: empty or unchanged.');
+            console.warn('[x-frame-bypass] Ignoring src change: URL is empty or unchanged.');
             return;
         }
         else{
@@ -60,7 +60,6 @@ customElements.define('x-frame-bypass', class extends HTMLIFrameElement {
 </body>
 </html>`
 		this.fetchProxy(url, options, 0).then(res => res.text()).then(data => {
-			console.log('[x-frame-bypass] Fetched content for:', url);
 			if (data) this.srcdoc = data.replace(/<head([^>]*)>/i, `<head$1>
 	<base href="${url}">
 	<script>
