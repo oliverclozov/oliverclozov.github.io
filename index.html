@@ -25,8 +25,8 @@
     document.getElementById('loadFrameCJ').addEventListener('click', () => {
         const url = urlInputCJ.value;
         console.log('[HTML] Clickjacking iframe src set to:', url);
-        iframeCJ.setAttribute('src', url);
-        //iframeCJ.src = url;
+        //iframeCJ.setAttribute('src', url);
+        iframeCJ.src = url;
     });
   </script>
 
