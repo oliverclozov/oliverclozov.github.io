@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Iframe Header Fetch</title>
+  <title>Clickjacking and CORS PoC</title>
   <style>
     body { font-family: sans-serif; padding: 20px; }
     iframe { width: 100%; height: 200px; border: 1px solid #ccc; }
@@ -12,12 +12,12 @@
   <script src="/js/x-frame-bypass.js" type="module"></script>
 </head>
 <body>
-  <h1>If Site Loads Below, it is Vulnerable to Clickjacking</h1>
+  <h1>Vulnerable to Clickjacking if Website Below Loads</h1>
   <input type="text" id="urlInput" placeholder="Enter URL here" style="width: 100%; padding: 8px;" />
-  <button id="loadFrameCJ">Load Iframe</button>
+  <button id="loadFrameCJ">Load iframe</button>
   <iframe id="myFrameCJ" src=""></iframe>
   
-  <script> 
+  <script>
     const iframeCJ = document.getElementById('myFrameCJ');
     const urlInputCJ = document.getElementById('urlInput');
 
@@ -28,8 +28,8 @@
     });
   </script>
   
-  <h1>If Site Loads Below, it is Vulnerable to CORS Frame Bypass</h1>
-  <button id="loadFrame">Load Iframe</button>
+  <h1>Vulnerable to CORS X-Frame Bypass if Site Below Loads</h1>
+  <button id="loadFrame">Load iframe</button>
   <iframe is="x-frame-bypass" id="myFrame" src=""></iframe>
   <button id="fetchHeaders">Fetch Headers</button>
   <pre id="headers">Click "Fetch Headers" to view response headers.</pre>
@@ -45,9 +45,10 @@
             console.warn('[HTML] No URL provided for iframe.');
             return;
         }
+
         console.log('[HTML] Load button clicked. Setting iframe.src to:', url);
         iframe.setAttribute('src', url); // calls attributeChangedCallback in x-frame-bypass.js
-        headersDisplay.textContent = 'Iframe loaded. Click "Fetch Headers" to get headers.';
+        headersDisplay.textContent = 'iframe loaded. Click "Fetch Headers" to get headers.';
     });
 
     document.getElementById('fetchHeaders').addEventListener('click', () => {
@@ -60,7 +61,6 @@
 
       const proxyUrl = 'https://cors-anywhere.herokuapp.com/' + url;
       console.log('[HTML] Fetching headers for:', proxyUrl);
-
 
       fetch(proxyUrl, {
         method: 'GET',
